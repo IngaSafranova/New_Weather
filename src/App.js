@@ -1,8 +1,7 @@
-
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
-import React, {useState } from "react";
-import { base } from "./config";
+import React, { useState } from "react";
+import { key } from "./config";
 //import { useEffect } from "react";
 //import "./App.css";
 
@@ -11,16 +10,10 @@ export default function App() {
   const [weather, setWeather] = useState({});
   const [geo, setGeo] = useState([]);
 
-  // useEffect(()=>{
-  //   handleGeo();
-  //   return setWeather
-  // },[city])
-
-console.log(base)
-
- const handleGeo = (e) => {
-    
-     if(e.key ==="Enter" || e.type === "click") {
+  console.log(process.env.REACT_APP_API_KEY);
+  console.log(key);
+  const handleGeo = (e) => {
+    if (e.key === "Enter" || e.type === "click") {
       fetch(
         `
    ${process.env.REACT_APP_API_BASE1}direct?q=${city}&limit=5&appid=${process.env.REACT_APP_API_KEY}`
@@ -29,27 +22,26 @@ console.log(base)
         .then((result) => {
           setGeo({
             city: result[0].name,
-          country: result[0].country
-        })
+            country: result[0].country,
+          });
           const lat = result[0].lat;
           const lon = result[0].lon;
-         console.log(result)
+          console.log(result);
 
-         
           return fetch(`
                 ${process.env.REACT_APP_API_BASE}onecall?lat=${lat}&lon=${lon}&units=metric&appid=${process.env.REACT_APP_API_KEY}`)
             .then((res) => res.json())
             .then((data) => {
               console.log(data);
-              setWeather({ temp: data.current.temp,
-                            weather: data.current.weather[0].description });
-              
+              setWeather({
+                temp: data.current.temp,
+                weather: data.current.weather[0].description,
+              });
             });
         });
-        setCity("");
+      setCity("");
     }
   };
-
 
   const dateBuilder = (d) => {
     let months = [
@@ -83,38 +75,45 @@ console.log(base)
     return `${day} ${date} ${month} ${year}`;
   };
   return (
-    <div className={typeof(weather.current !=="undefined")? weather.temp > 17? "app warm":"app":"app"}>
+    <div
+      className={
+        typeof (weather.current !== "undefined")
+          ? weather.temp > 17
+            ? "app warm"
+            : "app"
+          : "app"
+      }
+    >
       <main>
-      <div className="flex">
-        <div className="search-box">
-          <input
-            className="search-bar"
-            type="text"
-            placeholder="Search..."
-            onChange={e =>setCity(e.target.value)}
-            query ={city}
-           value ={city}
-         
-          />
-     
-         <button onClick={handleGeo} className="btn" fontSize="large">Search</button>
+        <div className="flex">
+          <div className="search-box">
+            <input
+              className="search-bar"
+              type="text"
+              placeholder="Search..."
+              onChange={(e) => setCity(e.target.value)}
+              query={city}
+              value={city}
+            />
+
+            <button onClick={handleGeo} className="btn" fontSize="large">
+              Search
+            </button>
+          </div>
         </div>
-        </div>
-        
 
         <div>
           <div className="location-box">
-            <div className="location">{geo.city}  {geo.country}</div>
+            <div className="location">
+              {geo.city} {geo.country}
+            </div>
             <div className="date">{dateBuilder(new Date())}</div>
           </div>
           <div className="weather-box">
-            <div className="temp"> 
-         {Math.round(weather.temp)}c
-         </div>
+            <div className="temp">{Math.round(weather.temp)}c</div>
             <div className="weather">{weather.weather}</div>
           </div>
         </div>
-        
       </main>
     </div>
   );
